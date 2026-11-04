@@ -11,22 +11,19 @@ const STEPS = [
     icon: Layers,
     eyebrow: "ONE TOKEN",
     title: "One token for all of Monad staking.",
-    body: "iMON is a single token that holds a balanced basket of Monad's liquid staking tokens. Instead of picking one and tracking it, you hold iMON and get the whole basket — kept in balance automatically.",
-    note: undefined as string | undefined,
+    body: "Hold the whole basket of Monad's staking tokens in a single token — balanced for you, automatically.",
   },
   {
     icon: RefreshCw,
     eyebrow: "AUTO-COMPOUNDING",
-    title: "It grows on its own, and you can leave anytime.",
-    body: "Rewards from every staking token in the basket are collected and reinvested for you — no claiming, no manual restaking. iMON is always redeemable: burn it to get the underlying basket back whenever you want.",
-    note: undefined,
+    title: "It grows on its own.",
+    body: "Rewards auto-compound in the background. Redeem anytime for the underlying basket.",
   },
   {
     icon: ShieldCheck,
     eyebrow: "WHAT TO KNOW",
     title: "Bounded risk, stated plainly.",
-    body: "A hard per-token cap limits how much of iMON any single staking token can become — so a problem with one token can't sink the whole position. This caps the downside; it doesn't remove it. iMON is a smart contract, not a deposit: value can fall and yields vary.",
-    note: "Non-custodial. You hold the keys. Redeemable for the underlying basket at all times.",
+    body: "A hard per-token cap limits how much any one token can cost you. It caps the downside — it doesn't remove it.",
   },
 ];
 
@@ -52,32 +49,29 @@ export function OnboardingGate() {
   const doConnect = () => connectors[0] && connect({ connector: connectors[0] });
 
   const variants = {
-    enter: (d: number) => ({ x: reduce ? 0 : d * 24, opacity: 0 }),
+    enter: (d: number) => ({ x: reduce ? 0 : d * 28, opacity: 0 }),
     center: { x: 0, opacity: 1 },
-    exit: (d: number) => ({ x: reduce ? 0 : d * -24, opacity: 0 }),
+    exit: (d: number) => ({ x: reduce ? 0 : d * -28, opacity: 0 }),
   };
 
   return (
     <Dialog.Root open>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px]" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[3px]" />
         <Dialog.Content
           onEscapeKeyDown={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
           aria-describedby="ob-body"
-          className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(90vh,620px)] w-[min(92vw,440px)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-surface shadow-pop focus:outline-none"
+          className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(92vh,560px)] w-[min(94vw,620px)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[32px] bg-surface shadow-pop focus:outline-none"
         >
           <Dialog.Title className="sr-only">Welcome to iMON</Dialog.Title>
 
-          <div className="flex items-center gap-2 px-6 pt-6">
-            <span className="text-sm font-semibold text-ink">iMON</span>
-            <span className="rounded-full bg-accent-tint px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-accent">
-              Monad
-            </span>
+          <div className="px-10 pt-9">
+            <span className="text-base font-bold tracking-tight text-ink">iMON</span>
           </div>
 
-          <div className="flex-1 px-6 py-6">
-            <div className="relative min-h-[224px]">
+          <div className="flex-1 px-10 py-8">
+            <div className="relative min-h-[216px]">
               <AnimatePresence mode="wait" custom={dir} initial={false}>
                 <motion.div
                   key={step}
@@ -86,36 +80,35 @@ export function OnboardingGate() {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-tint text-accent">
-                    <Icon size={24} />
+                  <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-tint text-accent">
+                    <Icon size={28} />
                   </div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-ink-3">{S.eyebrow}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-3">{S.eyebrow}</p>
                   <h2
                     ref={headingRef}
                     tabIndex={-1}
-                    className="mt-1 text-2xl font-semibold tracking-tight text-ink outline-none"
+                    className="mt-2 text-[30px] font-bold leading-[1.15] tracking-tight text-ink outline-none"
                   >
                     {S.title}
                   </h2>
-                  <p id="ob-body" className="mt-3 text-[15px] leading-relaxed text-ink-2">
+                  <p id="ob-body" className="mt-3 max-w-[30rem] text-[15px] leading-relaxed text-ink-3">
                     {S.body}
                   </p>
-                  {S.note && <p className="mt-3 text-xs leading-relaxed text-ink-3">{S.note}</p>}
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-t border-line px-6 py-4">
-            <div role="group" aria-label="Onboarding progress" className="flex gap-1.5">
+          <div className="flex items-center justify-between gap-3 border-t border-line px-10 py-6">
+            <div role="group" aria-label="Onboarding progress" className="flex gap-2">
               {STEPS.map((_, i) => (
                 <span
                   key={i}
                   aria-current={i === step ? "step" : undefined}
                   className={`h-1.5 rounded-full transition-all duration-200 ${
-                    i === step ? "w-5 bg-accent" : "w-1.5 bg-ink/15"
+                    i === step ? "w-6 bg-accent" : "w-1.5 bg-ink/15"
                   }`}
                 />
               ))}
@@ -126,7 +119,7 @@ export function OnboardingGate() {
               {step > 0 && (
                 <button
                   onClick={() => go(-1)}
-                  className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-ink-3 transition-colors hover:bg-muted hover:text-ink-2"
+                  className="inline-flex items-center gap-1 rounded-xl px-3 py-2.5 text-sm font-medium text-ink-3 transition-colors hover:bg-muted hover:text-ink-2"
                 >
                   <ChevronLeft size={16} /> Back
                 </button>
@@ -135,7 +128,7 @@ export function OnboardingGate() {
                 onClick={isLast ? doConnect : () => go(1)}
                 disabled={isLast && (isPending || !connectors[0])}
                 aria-label={isLast ? "Connect wallet" : "Next step"}
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
               >
                 {isLast ? (
                   <>

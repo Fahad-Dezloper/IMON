@@ -2,6 +2,7 @@
 
 import { MOCK_ACTIVITY, MOCK_BASKET, MOCK_STATS } from "./mock";
 import type { Activity, LstAsset, VaultStats } from "./types";
+import { useLiveVault } from "./useLiveVault";
 
 export interface VaultData {
   stats: VaultStats;
@@ -10,12 +11,21 @@ export interface VaultData {
 }
 
 /**
- * The single data seam for vault-level reads.
- *
- * TODO(backend integration): replace the mock returns with wagmi `useReadContracts`
- * against iMONVault (nav, navPerShare, getAssets + per-asset weight/cap/rate) and
- * AssetRegistry once `deployments.143.json` has addresses. Components never change.
+ * Vault-level data. Overlays live NAV / navPerShare / totalSupply from the deployed
+ * vault when available; everything else (basket metadata, logos, activity) stays mock
+ * until those are wired. Falls back to mock on any missing value.
  */
 export function useVaultData(): VaultData {
-  return { stats: MOCK_STATS, basket: MOCK_BASKET, activity: MOCK_ACTIVITY };
+  const live = useLiveVault();
+  const navMon = live.navMon ?? MOCK_STATS.navMon;
+
+  const stats: VaultStats = {
+    ...MOCK_STATS,
+    navMon,
+    navPerShare: live.navPerShare ?? MOCK_STATS.navPerShare,
+    totalSupply: live.totalSupply ?? MOCK_STATS.totalSupply,
+    tvlUsd: navMon * MOCK_STATS.monUsd,
+  };
+
+  return { stats, basket: MOCK_BASKET, activity: MOCK_ACTIVITY };
 }

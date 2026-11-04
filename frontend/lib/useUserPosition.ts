@@ -1,8 +1,11 @@
 "use client";
 
-import { useAccount } from "wagmi";
-import { MOCK_POSITION } from "./mock";
+import { useAccount, useReadContract } from "wagmi";
+import { formatUnits } from "viem";
+import { MOCK_POSITION, MOCK_STATS } from "./mock";
 import type { UserPosition } from "./types";
+import { MONAD_CHAIN_ID, iMONVaultABI, vaultAddress } from "./contracts";
+import { useLiveVault } from "./useLiveVault";
 
 const EMPTY: UserPosition = {
   connected: false,
@@ -15,15 +18,39 @@ const EMPTY: UserPosition = {
 };
 
 /**
- * The single data seam for the connected user's position.
- *
- * Mocked for now, but wallet-aware: it returns the empty state until a wallet is
- * connected, so the real empty/connected UX is already exercised.
- *
- * TODO(backend integration): read balanceOf(user), previewRedeem(balance), and the
- * user's wallet token balances once the vault is deployed.
+ * The connected user's position. Reads the real iMON balance from the vault and values
+ * it at the live navPerShare when available; otherwise falls back to the mock position
+ * so the demo renders. Returns the empty state until a wallet is connected.
  */
 export function useUserPosition(): UserPosition {
-  const { isConnected } = useAccount();
-  return isConnected ? { ...MOCK_POSITION, connected: true } : EMPTY;
+  const { address, isConnected } = useAccount();
+  const live = useLiveVault();
+
+  const { data: bal } = useReadContract({
+    address: vaultAddress ?? undefined,
+    abi: iMONVaultABI,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    chainId: MONAD_CHAIN_ID,
+    query: { enabled: Boolean(vaultAddress && address), refetchInterval: 12_000 },
+  });
+
+  if (!isConnected) return EMPTY;
+
+  const iMon = typeof bal === "bigint" ? Number(formatUnits(bal, 18)) : undefined;
+
+  if (iMon !== undefined && live.navPerShare) {
+    const valueMon = iMon * live.navPerShare;
+    return {
+      ...MOCK_POSITION, // keep mock wallet balances for the (still-mock) deposit modal
+      connected: true,
+      iMonBalance: iMon,
+      valueMon,
+      valueUsd: valueMon * MOCK_STATS.monUsd,
+      costBasisMon: valueMon, // no on-chain cost basis — don't fabricate earnings
+      earnedMon: 0,
+    };
+  }
+
+  return { ...MOCK_POSITION, connected: true };
 }

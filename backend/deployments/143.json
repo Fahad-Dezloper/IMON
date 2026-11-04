@@ -2,19 +2,68 @@
   "chainId": 143,
   "network": "monad-mainnet",
   "rpc": "https://rpc.monad.xyz",
-  "explorer": "https://monadvision.com",
+  "explorer": "https://monadscan.com",
+  "deployedAt": "2026-11-04",
+  "deployer": "0xA760ABcdB4249C9Bb598a20e67DE8cC79b606bE8",
   "contracts": {
-    "iMONVault": null,
-    "AssetRegistry": null,
-    "RateReader": null,
+    "iMONVault": "0x821D8143d8Df17B55E40374f7FdcEe5706fC3e2E",
+    "RateReader": "0x39963350bdfE244515891C6d877e512D61B2b2e8",
+    "YieldOracle": "0xC33677eBB984388a363C6399ED5712F09F0524C4",
+    "AssetRegistry": "0xd59580620D2640058aE7A6E2CE124F80A99259EA",
+    "UniswapV3SwapAdapter": "0x68e66EFa46B693ac87d6AA48E312B8B334c12C9f",
+    "ShMONRateAdapter": "0x2BB26ACb4a015A00B56A529c6fA67C1d9cAffb69",
     "FeeController": null,
     "Guardian": null
   },
-  "assets": {
-    "shMON":  { "address": null, "provider": "FastLane", "rateFn": "convertToAssets", "capBps": 3000 },
-    "gMON":   { "address": null, "provider": "Magma",    "rateFn": null, "capBps": 3000 },
-    "sMON":   { "address": null, "provider": "Kintsu",   "rateFn": null, "capBps": 3000 },
-    "aprMON": { "address": null, "provider": "aPriori",  "rateFn": null, "capBps": 1500 }
+  "legacy": {
+    "iMONVault_v1_shmonOnly": "0xfC23ebd82FA90392c1251b835F901C9ac1373b49",
+    "iMONVault_v2_lstOnly": "0x516191871A97e8171ffCb53565B7E4D00295EfbF"
   },
-  "notes": "Addresses are null until confirmed on-chain and deployed. capBps = hard per-asset weight cap. See backend/docs/BUILD.md section 'Confirm LST addresses' before filling these."
+  "assets": {
+    "shMON": {
+      "address": "0x1B68626dCa36c7fE922fD2d55E4f631d962dE19c",
+      "provider": "FastLane",
+      "rateFn": "convertToAssets(1e18)",
+      "capBps": 3000,
+      "enabledAtLaunch": true,
+      "inVault": true,
+      "llamaPoolId": "ee40513c-9356-4c53-9f26-446b484a8ae2"
+    },
+    "gMON": {
+      "address": "0x8498312A6B3CbD158bf0c93AbdCF29E6e4F55081",
+      "provider": "Magma",
+      "rateFn": "convertToAssets(1e18)",
+      "capBps": 3000,
+      "enabledAtLaunch": true,
+      "inVault": true,
+      "llamaPoolId": "96f74061-dc9a-4ef7-8117-6cd3935230de"
+    },
+    "aprMON": {
+      "address": "0x0c65A0BC65a5D819235B71F554D210D3F80E0852",
+      "provider": "aPriori / Capricorn",
+      "rateFn": "convertToAssets(1e18)",
+      "capBps": 1500,
+      "enabledAtLaunch": true,
+      "inVault": true,
+      "llamaPoolId": null,
+      "fallbackApy": 7.61,
+      "apySource": "https://app.capricorn.tech/"
+    },
+    "sMON": {
+      "address": "0xA3227C5969757783154C60bF0bC1944180ed81B9",
+      "provider": "Kintsu",
+      "rateFn": null,
+      "capBps": 3000,
+      "enabledAtLaunch": false,
+      "inVault": false,
+      "llamaPoolId": "73c511a9-4dc0-4397-babe-e578fd75f0dd",
+      "rateNote": "Need rate ABI before wiring — required for true ≤30% 4-sleeve caps"
+    }
+  },
+  "canonical": {
+    "WMON": "0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A",
+    "CreateX": "0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed",
+    "SwapRouter02": "0xfE31F71C1b106EAc32F1A19239c9a9A72ddfb900"
+  },
+  "notes": "v3 vault: depositMON (native MON → WMON → preferred LST → iMON). Live APY routing via YieldOracle. Redeem = pro-rata basket. See docs/APR_ROTATION.md. Unaudited."
 }

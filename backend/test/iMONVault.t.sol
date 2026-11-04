@@ -93,20 +93,67 @@ contract iMONVaultTest is Test {
     }
 
     function test_MultiAssetNav() public {
-        _deposit(alice, tokenA, 100 ether);
-        _deposit(alice, tokenB, 50 ether);
-        assertEq(vault.nav(), 150 ether);
+        // ≤30% caps require ≥4 sleeves; seed equal weights at 25%.
+        MockERC20 tokenC = new MockERC20("c", "c");
+        MockERC20 tokenD = new MockERC20("d", "d");
+        reader.setRate(address(tokenC), ONE);
+        reader.setRate(address(tokenD), ONE);
+        vault.addAsset(address(tokenC));
+        vault.addAsset(address(tokenD));
+        tokenC.mint(alice, 1_000 ether);
+        tokenD.mint(alice, 1_000 ether);
+        vm.startPrank(alice);
+        tokenC.approve(address(vault), type(uint256).max);
+        tokenD.approve(address(vault), type(uint256).max);
+        vm.stopPrank();
+
+        address[] memory assetsIn = new address[](4);
+        uint256[] memory amts = new uint256[](4);
+        assetsIn[0] = address(tokenA);
+        assetsIn[1] = address(tokenB);
+        assetsIn[2] = address(tokenC);
+        assetsIn[3] = address(tokenD);
+        amts[0] = 100 ether;
+        amts[1] = 100 ether;
+        amts[2] = 100 ether;
+        amts[3] = 100 ether;
+        vm.prank(alice);
+        vault.depositMany(assetsIn, amts, alice);
+        assertEq(vault.nav(), 400 ether);
     }
 
     function test_RedeemReturnsAllAssets() public {
-        _deposit(alice, tokenA, 100 ether);
-        _deposit(alice, tokenB, 100 ether);
+        MockERC20 tokenC = new MockERC20("c", "c");
+        MockERC20 tokenD = new MockERC20("d", "d");
+        reader.setRate(address(tokenC), ONE);
+        reader.setRate(address(tokenD), ONE);
+        vault.addAsset(address(tokenC));
+        vault.addAsset(address(tokenD));
+        tokenC.mint(alice, 1_000 ether);
+        tokenD.mint(alice, 1_000 ether);
+        vm.startPrank(alice);
+        tokenC.approve(address(vault), type(uint256).max);
+        tokenD.approve(address(vault), type(uint256).max);
+        vm.stopPrank();
+
+        address[] memory assetsIn = new address[](4);
+        uint256[] memory seedAmts = new uint256[](4);
+        assetsIn[0] = address(tokenA);
+        assetsIn[1] = address(tokenB);
+        assetsIn[2] = address(tokenC);
+        assetsIn[3] = address(tokenD);
+        seedAmts[0] = 100 ether;
+        seedAmts[1] = 100 ether;
+        seedAmts[2] = 100 ether;
+        seedAmts[3] = 100 ether;
+        vm.prank(alice);
+        vault.depositMany(assetsIn, seedAmts, alice);
         uint256 shares = vault.balanceOf(alice);
         vm.prank(alice);
-        (address[] memory a, uint256[] memory amts) = vault.redeem(shares, alice);
-        assertEq(a.length, 2);
-        assertGt(amts[0], 0, "returns token A");
-        assertGt(amts[1], 0, "returns token B");
+        (address[] memory outA, uint256[] memory outAmts) = vault.redeem(shares, alice);
+        assertEq(outA.length, 4);
+        assertGt(outAmts[0], 0, "returns token A");
+        assertGt(outAmts[1], 0, "returns token B");
     }
 
     function test_ZeroAmountReverts() public {

@@ -8,10 +8,10 @@ limited confirmed-token set) until a security review is done.
 |---|---|---|---|
 | **0 · Foundations** | Monorepo scaffold, Monad mainnet config, app shell, empty test suite | Repo builds; tests pass; app connects a wallet to Monad | ✅ done |
 | **1 · Core vault** | `iMONVault` — deposit LST → mint iMON at NAV; redeem → pro-rata basket; NAV from each LST's rate; inflation-attack defense | Foundry tests pass (mint/redeem/NAV/rounding) | ✅ done (14 tests) |
-| **2 · Pricing + mocks** | `RateReader` with staleness/deviation/monotonic guards + the real LST rate adapters; mainnet-fork test against shMON | NAV tracks accruing yield; a de-peg can be simulated; fork test green | ⬜ next |
-| **3 · Risk engine** | Per-LST weight caps enforced on deposit/rebalance; `Guardian` + off-chain health monitor auto-pausing deposits (redeem always open) | Scripted de-peg → deposits auto-pause; cap cannot be exceeded | ⬜ |
+| **2 · Pricing + mocks** | `RateReader` with staleness/deviation/monotonic guards + the real LST rate adapters; mainnet-fork test against shMON | NAV tracks accruing yield; a de-peg can be simulated; fork test green | ✅ done |
+| **3 · Risk engine** | Per-LST weight caps enforced on deposit/rebalance; `Guardian` + off-chain health monitor auto-pausing deposits (redeem always open) | Scripted de-peg → deposits auto-pause; cap cannot be exceeded | ⬜ next |
 | **4 · Rebalance + swap** | Rebalance toward targets within caps; LST↔LST swap through the vault with a fee (the volume revenue engine) | Drift → rebalances; swap works and takes its fee | ⬜ |
-| **5 · The app** | Aave-grade UI: dashboard, deposit modal w/ signing preview, basket + health views, honest redeem, portfolio + live count-up | Full flow works against mainnet contracts | ⬜ |
+| **5 · The app** | Aave-grade UI: dashboard, deposit modal w/ signing preview, basket + health views, honest redeem, portfolio + live count-up | Full flow works against mainnet contracts | ✅ v1 wired (connect + deposit/redeem against live vault); polish later |
 | **6 · Demo polish** | Live NAV ticker on real on-chain state; scripted demo (deposit → yield ticks → de-peg → auto-pause + bounded loss); deploy app | 2-minute demo runs end to end on a public URL | ⬜ |
 | **7 · Hardening** *(post-hackathon)* | Real keeper, access-control/timelock review, audit, monitoring, collateral-listing integrations | Production-ready | ⬜ |
 

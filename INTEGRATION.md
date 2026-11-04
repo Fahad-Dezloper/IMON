@@ -3,38 +3,59 @@
 This is the only surface where the two halves meet. Keep it stable; change it with a note
 to both sides.
 
+## Live status (Monad mainnet, chain 143)
+
+**Phase 1+2 contracts are deployed and wired into the frontend.**
+
+| Contract | Address | Frontend usage |
+|---|---|---|
+| `iMONVault` | `0xfC23ebd82FA90392c1251b835F901C9ac1373b49` | Deposit / redeem / NAV reads |
+| `RateReader` | `0x5A6c7D433558f92797E4448eA50bc7Ba3A3a2ee7` | `rateOf(shMON)` for dashboard |
+| `ShMONRateAdapter` | `0xf586cB3f1dE58a43A3D6E1626D7f232d59DdfA1e` | Behind RateReader (not called directly by UI) |
+| shMON (FastLane) | `0x1B68626dCa36c7fE922fD2d55E4f631d962dE19c` | ERC-20 approve + deposit asset |
+| AssetRegistry / FeeController / Guardian | `null` | Phase 3 — not deployed |
+
+- Address book: `backend/deployments/143.json` → copied to `frontend/lib/deployments.143.json`
+- ABIs: `frontend/lib/abi/{iMONVault,RateReader,ShMONRateAdapter,ERC4626RateAdapter}.json`
+- App entry: `frontend/lib/contracts.ts` → `frontend/components/VaultDashboard.tsx`
+- Explorer: https://monadscan.com
+- RPC: https://rpc.monad.xyz
+
+Unaudited guarded launch: **shMON only**, no on-chain deposit caps / pause guardian yet.
+
 ## Branch & sync workflow
 
 - Single long-lived branch: **`main`**. Both people push to `main` (small, frequent commits).
-- Work stays in your own folder: frontend → `frontend/`, backend → `backend/`. Because the
-  two folders don't overlap, pushes to `main` rarely conflict.
-- **Pull `main` frequently** (every ~15 min, or before each work session) so each side has
-  the latest of the other. Use the helper:
+- Work stays in your own folder: frontend → `frontend/`, backend → `backend/`.
+- Pull often:
 
   ```bash
-  ./scripts/sync.sh      # git pull --rebase --autostash, then builds + tests the backend
+  ./scripts/sync.sh
   ```
 
-- Never commit secrets (`.env`, `.env.local`) or `lib/` / `out/` / `node_modules/` (all
-  gitignored).
+- Never commit secrets (`.env`, `.env.local`) or `lib/` / `out/` / `node_modules/`.
 
 ## How the backend publishes to the frontend
 
-The frontend must **not** need the Foundry toolchain. The backend publishes two things:
+The frontend must **not** need Foundry. Backend publishes:
 
-1. **Addresses** — `backend/deployments/143.json` (committed). One entry per deployed
-   contract. Until deployed, values are `null`.
-2. **ABIs** — copied into `frontend/lib/abi/*.json` (committed) by:
+1. **Addresses** — `backend/deployments/143.json` (committed).
+2. **ABIs** — via:
 
    ```bash
-   ./scripts/export-abi.sh        # runs `forge build`, copies iMONVault (+others) ABIs to frontend/lib/abi
+   ./scripts/export-abi.sh
    ```
 
-   The frontend imports addresses + ABIs through `frontend/lib/contracts.ts`.
+   Writes ABIs into `frontend/lib/abi/` and copies the address book.
 
-So the contract between the two sides is: **`deployments/143.json` + `frontend/lib/abi/*.json`**.
-When the backend changes a function signature or deploys a new address, it re-runs
-`export-abi.sh`, updates `143.json`, and pushes. The frontend picks it up on the next pull.
+Frontend imports through `frontend/lib/contracts.ts` (`vaultAddress`, `iMONVaultABI`, etc.).
+
+## Wallet + chain (frontend)
+
+- wagmi v2 + injected connector (`frontend/lib/wagmi.ts`)
+- Chain config: `frontend/lib/chains.ts` (id **143**)
+- Connect / disconnect: `frontend/components/WalletButton.tsx`
+- Wrong-network → “Switch to Monad” via `useSwitchChain`
 
 ## The vault interface the frontend relies on (`iMONVault`)
 
@@ -53,16 +74,34 @@ Writes:
   (requires ERC-20 `approve(vault, amountIn)` on the asset first)
 - `redeem(uint256 shares, address receiver) → (address[] assets, uint256[] amounts)`
 
-Events (for the dashboard / activity feed):
+Also used:
+- RateReader `rateOf(address asset)`
+- ERC-20 `balanceOf` / `allowance` / `approve` on shMON
+
+Events:
 - `Deposited(caller, receiver, asset, amountIn, sharesOut)`
 - `Redeemed(caller, receiver, sharesIn)`
 - `AssetAdded(asset)`
 
-> Coming in later phases and additive to this list: per-asset caps + `depositsPaused()`
-> (Phase 3), rebalance + LST↔LST swap (Phase 4), fee views (FeeController). The backend
-> will update this file when they land.
+> Later (additive): caps + `depositsPaused()` (Phase 3), swap (Phase 4), fee views.
+
+## End-to-end user flows (implemented)
+
+### Deposit shMON → iMON
+
+1. Connect injected wallet; switch to chain 143 if needed.
+2. UI reads `previewDeposit(shMON, amount)`.
+3. If `allowance < amount`, send `shMON.approve(vault, amount)` and wait for receipt.
+4. Send `vault.deposit(shMON, amount, user)` and wait for receipt.
+5. Refetch balances / NAV.
+
+### Redeem iMON → basket
+
+1. UI reads `previewRedeem(shares)`.
+2. Send `vault.redeem(shares, user)` (no approve, no oracle).
+3. Refetch. User receives pro-rata shMON (and any future basket assets).
 
 ## Chain
 
 Monad mainnet — chain id **143**, RPC `https://rpc.monad.xyz`, explorer
-`https://monadvision.com`. The frontend's chain config is `frontend/lib/chains.ts`.
+`https://monadscan.com` (also MonadVision). Frontend chain config: `frontend/lib/chains.ts`.

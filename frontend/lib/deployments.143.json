@@ -1,0 +1,18 @@
+{
+  "chainId": 143,
+  "network": "monad-mainnet",
+  "contracts": {
+    "iMONVault": null,
+    "AssetRegistry": null,
+    "RateReader": null,
+    "FeeController": null,
+    "Guardian": null
+  },
+  "assets": {
+    "shMON":  { "address": null, "provider": "FastLane", "capBps": 3000 },
+    "gMON":   { "address": null, "provider": "Magma",    "capBps": 3000 },
+    "sMON":   { "address": null, "provider": "Kintsu",   "capBps": 3000 },
+    "aprMON": { "address": null, "provider": "aPriori",  "capBps": 1500 }
+  },
+  "notes": "Published from backend/deployments/143.json by scripts/export-abi.sh. Addresses null until deployed."
+}

@@ -8,53 +8,49 @@ auto-compounds, and a hard per-token cap bounds how much any single provider can
 cost you. Redemption always returns your pro-rata slice of the basket — no oracle, no
 cap check, never paused.
 
-This repo is a monorepo built **phase by phase**. See [`docs/PHASES.md`](docs/PHASES.md)
-for the plan and current status, and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for
-the locked design decisions.
+> **Target network: Monad mainnet (chain id 143).** Unaudited. Launch is guarded (hard
+> deposit caps, a limited token set) until a security review is complete.
 
-> **Target network: Monad mainnet (chain id 143).** This code is unaudited. Launch is
-> guarded (hard deposit caps, a limited token set) until a security review is complete.
-> Do not deposit funds you cannot afford to lose.
-
-## Layout
+## Monorepo layout & ownership
 
 ```
 imon/
-├── contracts/   Foundry (Solidity) — the vault, registry, rate reader, fees, guardian
-├── web/         Next.js + wagmi/viem/RainbowKit — the app
-└── docs/        Phase plan + architecture
+├── frontend/   Next.js + wagmi/viem/RainbowKit — the app        (owner: frontend)
+├── backend/    Foundry contracts + off-chain services + specs    (owner: backend)
+│   ├── src/ test/ script/        the Solidity + tests
+│   ├── services/                 off-chain keeper / health monitor (Phase 3)
+│   ├── deployments/              published addresses per chain (143.json)
+│   ├── docs/ ARCHITECTURE.md BUILD.md   the full backend build spec
+│   └── README.md                 start here if you're building the backend
+├── scripts/    sync.sh (pull + test) · export-abi.sh (publish ABIs to frontend)
+├── docs/       PHASES.md — shared roadmap
+├── INTEGRATION.md   the contract between frontend and backend (addresses, ABIs, workflow)
+└── README.md
 ```
 
-## Quickstart
+**Division of work:** the **frontend** person builds `frontend/`; the **backend** person
+builds `backend/`. Both pull `main` frequently (see [`INTEGRATION.md`](INTEGRATION.md)).
+The two sides meet only at the integration contract: the ABIs + deployed addresses the
+backend publishes, which the frontend consumes.
 
-### Contracts (Foundry)
+## Setup
 
 ```bash
-cd contracts
-forge install            # pulls forge-std (already vendored as a submodule)
-forge build
-forge test
+# backend
+cd backend && forge install foundry-rs/forge-std OpenZeppelin/openzeppelin-contracts && forge build && forge test
+
+# frontend
+cd frontend && cp -n .env.local.example .env.local && npm install && npm run dev   # localhost:3000
 ```
 
-> **Deploying to Monad needs Foundry ≥ 1.8.0** with the Monad network profile
-> (`network = "monad"` in `foundry.toml`). Building and testing work on older Foundry
-> against a standard EVM; the Monad-specific gas/opcode model only matters at deploy and
-> mainnet-fork time. Upgrade with `foundryup` before Phase 1 deploy work.
-
-### Web (Next.js)
-
-```bash
-cd web
-cp .env.local.example .env.local   # add a WalletConnect project id
-npm install
-npm run dev                        # http://localhost:3000
-```
-
-The app connects a wallet to Monad mainnet (chain 143). You'll need a free WalletConnect
-project id from https://cloud.reown.com (formerly WalletConnect Cloud).
+`lib/` (forge deps) is gitignored — run `forge install` after cloning. The app needs a
+free WalletConnect project id in `frontend/.env.local` (from https://cloud.reown.com).
 
 ## Status
 
-**Phase 0 — Foundations: complete.** Monorepo scaffold, Monad mainnet config, a
-wallet-connecting app shell, and a passing contract test suite. No contracts deployed, no
-funds involved. Next: Phase 1 — the core vault.
+- **Phase 0 — Foundations:** done. Monorepo, Monad mainnet config, wallet-connecting shell.
+- **Phase 1 — Core vault:** done. `iMONVault` (multi-asset NAV, pro-rata redeem, three-layer
+  inflation/donation defense) — 14 passing Foundry tests incl. a fuzz round-trip.
+
+Next: **Phase 2** — production `RateReader` + real LST adapters + a mainnet-fork test.
+See [`docs/PHASES.md`](docs/PHASES.md).

@@ -1,0 +1,32 @@
+[profile.default]
+src = "src"
+out = "out"
+test = "test"
+script = "script"
+libs = ["lib"]
+solc = "0.8.24"
+optimizer = true
+optimizer_runs = 200
+evm_version = "cancun"
+bytecode_hash = "none"
+ffi = false
+
+# NOTE: Deploying to / fork-testing against Monad requires Foundry >= 1.8.0, which adds
+# the Monad network profile. Once upgraded (`foundryup`), add under [profile.default]:
+#     network = "monad"
+# so forge/cast/anvil apply Monad's gas model, opcode pricing and precompiles. Building
+# and unit-testing on a standard EVM (as below) do not require it.
+
+[rpc_endpoints]
+monad = "${MONAD_MAINNET_RPC}"
+monad_mainnet = "https://rpc.monad.xyz"
+
+[etherscan]
+# Monadscan (Etherscan-style). chain id 143 = mainnet.
+monad = { key = "${MONADSCAN_API_KEY}", chain = 143, url = "https://api.monadscan.com/api" }
+
+[fmt]
+line_length = 110
+tab_width = 4
+bracket_spacing = true
+int_types = "long"

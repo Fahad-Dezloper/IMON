@@ -7,16 +7,22 @@
 # node / next
 node_modules/
 .next/
-out/
 dist/
 *.tsbuildinfo
 .vercel
 
-# foundry
-contracts/out/
-contracts/cache/
-contracts/broadcast/
-!contracts/broadcast/**/dry-run/
+# foundry build output
+backend/out/
+backend/cache/
+backend/broadcast/
+!backend/broadcast/**/dry-run/
+
+# forge dependencies — reinstall with `forge install` (see backend/README.md)
+# scoped to backend so it does NOT ignore frontend/lib (our app code lives there)
+/backend/lib/
+
+# stale directory left by the web/ -> frontend/ rename; safe to delete
+/web/
 
 # misc
 .DS_Store

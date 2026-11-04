@@ -7,8 +7,8 @@ limited confirmed-token set) until a security review is done.
 | Phase | Build | Done when | Status |
 |---|---|---|---|
 | **0 · Foundations** | Monorepo scaffold, Monad mainnet config, app shell, empty test suite | Repo builds; tests pass; app connects a wallet to Monad | ✅ done |
-| **1 · Core vault** | `iMONVault` — deposit LST → mint iMON at NAV; redeem → pro-rata basket; NAV from each LST's rate; inflation-attack defense | Foundry tests pass (mint/redeem/NAV/rounding); runs on a mainnet fork | ⬜ next |
-| **2 · Pricing + mocks** | Mock ERC-4626 LSTs (settable rate, to simulate yield and a crash) + `RateReader` with staleness/deviation guards | NAV tracks accruing yield; a de-peg can be simulated | ⬜ |
+| **1 · Core vault** | `iMONVault` — deposit LST → mint iMON at NAV; redeem → pro-rata basket; NAV from each LST's rate; inflation-attack defense | Foundry tests pass (mint/redeem/NAV/rounding) | ✅ done (14 tests) |
+| **2 · Pricing + mocks** | `RateReader` with staleness/deviation/monotonic guards + the real LST rate adapters; mainnet-fork test against shMON | NAV tracks accruing yield; a de-peg can be simulated; fork test green | ⬜ next |
 | **3 · Risk engine** | Per-LST weight caps enforced on deposit/rebalance; `Guardian` + off-chain health monitor auto-pausing deposits (redeem always open) | Scripted de-peg → deposits auto-pause; cap cannot be exceeded | ⬜ |
 | **4 · Rebalance + swap** | Rebalance toward targets within caps; LST↔LST swap through the vault with a fee (the volume revenue engine) | Drift → rebalances; swap works and takes its fee | ⬜ |
 | **5 · The app** | Aave-grade UI: dashboard, deposit modal w/ signing preview, basket + health views, honest redeem, portfolio + live count-up | Full flow works against mainnet contracts | ⬜ |

@@ -1,0 +1,20 @@
+{
+  "chainId": 143,
+  "network": "monad-mainnet",
+  "rpc": "https://rpc.monad.xyz",
+  "explorer": "https://monadvision.com",
+  "contracts": {
+    "iMONVault": null,
+    "AssetRegistry": null,
+    "RateReader": null,
+    "FeeController": null,
+    "Guardian": null
+  },
+  "assets": {
+    "shMON":  { "address": null, "provider": "FastLane", "rateFn": "convertToAssets", "capBps": 3000 },
+    "gMON":   { "address": null, "provider": "Magma",    "rateFn": null, "capBps": 3000 },
+    "sMON":   { "address": null, "provider": "Kintsu",   "rateFn": null, "capBps": 3000 },
+    "aprMON": { "address": null, "provider": "aPriori",  "rateFn": null, "capBps": 1500 }
+  },
+  "notes": "Addresses are null until confirmed on-chain and deployed. capBps = hard per-asset weight cap. See backend/docs/BUILD.md section 'Confirm LST addresses' before filling these."
+}

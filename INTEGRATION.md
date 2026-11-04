@@ -5,15 +5,18 @@ to both sides.
 
 ## Live status (Monad mainnet, chain 143)
 
-**Phase 1+2 contracts are deployed and wired into the frontend.**
+**v3 multi-asset vault is deployed and wired into the frontend.**
 
 | Contract | Address | Frontend usage |
 |---|---|---|
-| `iMONVault` | `0xfC23ebd82FA90392c1251b835F901C9ac1373b49` | Deposit / redeem / NAV reads |
-| `RateReader` | `0x5A6c7D433558f92797E4448eA50bc7Ba3A3a2ee7` | `rateOf(shMON)` for dashboard |
-| `ShMONRateAdapter` | `0xf586cB3f1dE58a43A3D6E1626D7f232d59DdfA1e` | Behind RateReader (not called directly by UI) |
-| shMON (FastLane) | `0x1B68626dCa36c7fE922fD2d55E4f631d962dE19c` | ERC-20 approve + deposit asset |
-| AssetRegistry / FeeController / Guardian | `null` | Phase 3 — not deployed |
+| `iMONVault` | `0x821D8143d8Df17B55E40374f7FdcEe5706fC3e2E` | `depositMON` / redeem / NAV + previews |
+| `YieldOracle` | `0xC33677eBB984388a363C6399ED5712F09F0524C4` | Per-asset effective APR for dashboard + routing |
+| `RateReader` | `0x39963350bdfE244515891C6d877e512D61B2b2e8` | `rateOf(asset)` for NAV |
+| `AssetRegistry` | `0xd59580620D2640058aE7A6E2CE124F80A99259EA` | Basket membership + caps |
+| `UniswapV3SwapAdapter` | `0x68e66EFa46B693ac87d6AA48E312B8B334c12C9f` | MON → best-APY LST on deposit |
+| `ShMONRateAdapter` | `0x2BB26ACb4a015A00B56A529c6fA67C1d9cAffb69` | Behind RateReader (not called directly by UI) |
+| Basket | shMON `0x1B68…E19c` · gMON `0x8498…5081` · aprMON `0x0c65…0852` | In-vault assets |
+| FeeController / Guardian | `null` | Not yet deployed |
 
 - Address book: `backend/deployments/143.json` → copied to `frontend/lib/deployments.143.json`
 - ABIs: `frontend/lib/abi/{iMONVault,RateReader,ShMONRateAdapter,ERC4626RateAdapter}.json`
@@ -21,7 +24,7 @@ to both sides.
 - Explorer: https://monadscan.com
 - RPC: https://rpc.monad.xyz
 
-Unaudited guarded launch: **shMON only**, no on-chain deposit caps / pause guardian yet.
+Guarded launch: **3-token basket** (shMON, gMON, aprMON) with hard per-token caps; sMON (Kintsu) staged pending its rate adapter; pause guardian not yet deployed.
 
 ## Branch & sync workflow
 

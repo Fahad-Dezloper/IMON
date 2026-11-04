@@ -1,19 +1,127 @@
 @import "tailwindcss";
 
-:root {
-  --background: #100e18;
-  --foreground: #efecf7;
+/* ---- Design tokens: app.aave.com light theme, purple promoted (verified source) ---- */
+@theme {
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, Arial, sans-serif;
+
+  /* surfaces */
+  --color-bg: #ffffff; /* app canvas — plain white */
+  --color-surface: #ffffff; /* cards, inputs, tables */
+  --color-raised: #fcfcfc;
+  --color-muted: #f2f2f2;
+  --color-bone: #f6f7f4;
+
+  /* soft-purple accent (app purple ramp) */
+  --color-accent: #716ef3;
+  --color-accent-bright: #9b99ff;
+  --color-accent-tint: #e0dfff;
+  --color-accent-deep: #5146e0; /* active/selected: white text passes AA (~6.4:1) */
+
+  /* text */
+  --color-ink: #0a0a0f; /* primary */
+  --color-ink-2: #666666; /* secondary */
+  --color-ink-3: #7d7d7d; /* muted */
+  --color-ink-4: #a8a8a8; /* faint / icon */
+
+  /* borders (alpha black) */
+  --color-line: rgb(0 0 0 / 0.06);
+  --color-line-2: rgb(0 0 0 / 0.08);
+
+  /* semantic — reserved strictly for gain/loss/state, never brand */
+  --color-success: #00bd68;
+  --color-success-bg: #ecf8ed;
+  --color-error: #eb4200;
+  --color-error-bg: #f9ebeb;
+  --color-warning: #f5a800;
+  --color-warning-bg: #fef5e8;
+  --color-secondary: #ff607b;
+
+  /* Aave's signature card look: soft drop + 1px ring, NO border */
+  --shadow-surface: 0 2px 4px 0 rgb(0 0 0 / 0.03), 0 0 0 1px rgb(0 0 0 / 0.08);
+  --shadow-pop: 0 8px 28px 0 rgb(0 0 0 / 0.10), 0 0 0 1px rgb(0 0 0 / 0.06);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* motion tokens (Emil/Rauno): ease-out default, transform+opacity only, <300ms core loop */
+:root {
+  color-scheme: light;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* all numeric data aligns + doesn't jitter on update */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* allocation sliders */
+.imon-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-muted);
+  outline: none;
+  cursor: pointer;
+}
+.imon-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px rgb(113 110 243 / 0.15);
+  transition: box-shadow 160ms var(--ease-out);
+}
+.imon-range::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 6px rgb(113 110 243 / 0.2);
+}
+.imon-range::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  cursor: pointer;
+}
+
+/* skeleton shimmer for loading states */
+@keyframes imon-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-muted);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.6), transparent);
+  animation: imon-shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
 }

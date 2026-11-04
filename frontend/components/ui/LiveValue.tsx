@@ -1,7 +1,7 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
 
 const YEAR_SECONDS = 365 * 24 * 60 * 60;
 
@@ -37,7 +37,12 @@ export function LiveValue({ base, apy, format, suffix, className }: LiveValuePro
 
   return (
     <span className={className}>
-      <NumberFlow value={value} format={format} willChange className="tnum" />
+      <NumberFlow
+        value={value}
+        format={format as ComponentProps<typeof NumberFlow>["format"]}
+        willChange
+        className="tnum"
+      />
       {suffix}
     </span>
   );

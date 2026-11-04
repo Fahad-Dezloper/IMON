@@ -83,7 +83,7 @@ export function SafetyView() {
           <b className="font-semibold text-ink">Honest limits.</b> A fast exploit or admin-key drain
           happens in one block — a cap can bound it, not dodge it. A Monad-level or shared price-feed
           failure hits every token at once, so diversification can&rsquo;t help there. iMON is
-          unaudited and a smart contract, not a deposit.
+          a smart contract, not a deposit.
         </p>
       </div>
     </div>

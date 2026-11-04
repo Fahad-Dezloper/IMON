@@ -1,6 +1,2 @@
 # forge-std and openzeppelin-contracts are installed with `forge install` and
-# gitignored (see .gitignore + backend/README.md), not tracked as submodules.
-# This keeps clones simple for a two-person team. Run `forge install` after cloning.
-[submodule "backend/lib/forge-std"]
-	path = backend/lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
+# gitignored, not tracked as submodules. Run `forge install` after cloning.

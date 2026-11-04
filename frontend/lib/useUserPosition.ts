@@ -1,11 +1,9 @@
 "use client";
 
-import { useAccount, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
-import { MOCK_POSITION, MOCK_STATS } from "./mock";
+import { useAccount, useBalance, useReadContracts } from "wagmi";
+import { MONAD_CHAIN_ID, iMONVaultABI, isDeployed, vaultAddress } from "./contracts";
 import type { UserPosition } from "./types";
-import { MONAD_CHAIN_ID, iMONVaultABI, vaultAddress } from "./contracts";
-import { useLiveVault } from "./useLiveVault";
 
 const EMPTY: UserPosition = {
   connected: false,
@@ -17,40 +15,41 @@ const EMPTY: UserPosition = {
   wallet: [],
 };
 
-/**
- * The connected user's position. Reads the real iMON balance from the vault and values
- * it at the live navPerShare when available; otherwise falls back to the mock position
- * so the demo renders. Returns the empty state until a wallet is connected.
- */
 export function useUserPosition(): UserPosition {
   const { address, isConnected } = useAccount();
-  const live = useLiveVault();
+  const vault = vaultAddress ?? undefined;
+  const enabled = Boolean(isDeployed && vault && address);
 
-  const { data: bal } = useReadContract({
-    address: vaultAddress ?? undefined,
-    abi: iMONVaultABI,
-    functionName: "balanceOf",
-    args: address ? [address] : undefined,
+  const { data } = useReadContracts({
+    allowFailure: true,
+    query: { enabled, refetchInterval: 8_000 },
+    contracts: enabled
+      ? [
+          { address: vault!, abi: iMONVaultABI, functionName: "balanceOf", args: [address!], chainId: MONAD_CHAIN_ID },
+          { address: vault!, abi: iMONVaultABI, functionName: "navPerShare", chainId: MONAD_CHAIN_ID },
+        ]
+      : [],
+  });
+
+  const { data: mon } = useBalance({
+    address,
     chainId: MONAD_CHAIN_ID,
-    query: { enabled: Boolean(vaultAddress && address), refetchInterval: 12_000 },
+    query: { enabled: Boolean(address), refetchInterval: 8_000 },
   });
 
   if (!isConnected) return EMPTY;
 
-  const iMon = typeof bal === "bigint" ? Number(formatUnits(bal, 18)) : undefined;
+  const iMonBalance = data?.[0]?.result !== undefined ? Number(formatUnits(data[0].result as bigint, 18)) : 0;
+  const navPerShare = data?.[1]?.result !== undefined ? Number(formatUnits(data[1].result as bigint, 18)) : 1;
+  const monBalance = mon?.value !== undefined ? Number(formatUnits(mon.value, 18)) : 0;
 
-  if (iMon !== undefined && live.navPerShare) {
-    const valueMon = iMon * live.navPerShare;
-    return {
-      ...MOCK_POSITION, // keep mock wallet balances for the (still-mock) deposit modal
-      connected: true,
-      iMonBalance: iMon,
-      valueMon,
-      valueUsd: valueMon * MOCK_STATS.monUsd,
-      costBasisMon: valueMon, // no on-chain cost basis — don't fabricate earnings
-      earnedMon: 0,
-    };
-  }
-
-  return { ...MOCK_POSITION, connected: true };
+  return {
+    connected: true,
+    iMonBalance,
+    valueMon: iMonBalance * navPerShare,
+    valueUsd: 0,
+    earnedMon: 0,
+    costBasisMon: 0,
+    wallet: [{ symbol: "MON", balance: monBalance }],
+  };
 }

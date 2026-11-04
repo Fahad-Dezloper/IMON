@@ -3,7 +3,7 @@
 import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { useUserPosition } from "@/lib/useUserPosition";
 import { useVaultData } from "@/lib/useVaultData";
-import { fmtMon, fmtPct, fmtUsd } from "@/lib/format";
+import { fmtMon, fmtPct } from "@/lib/format";
 import { LiveValue } from "./ui/LiveValue";
 
 interface Props {
@@ -34,10 +34,9 @@ export function ValueHero({ onDeposit, onRedeem }: Props) {
       </div>
 
       {connected ? (
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-ink-3">
-          <span className="tnum">{fmtUsd(pos.valueUsd)}</span>
-          <span className="text-ink-4">·</span>
-          <span className="tnum text-success">+{fmtMon(pos.earnedMon)} MON earned</span>
+        <div className="mt-3 text-sm text-ink-3">
+          <span className="tnum">{fmtMon(pos.iMonBalance)} iMON</span> · net APY{" "}
+          <span className="tnum">{fmtPct(stats.netApy)}</span>
         </div>
       ) : (
         <p className="mt-3 text-sm text-ink-3">

@@ -83,7 +83,7 @@ export function Sidebar({ open, onClose, view, onNavigate }: Props) {
               })}
             </nav>
 
-            <div className="mt-auto text-xs text-ink-4">iMON · Monad · unaudited</div>
+            <div className="mt-auto text-xs text-ink-4">iMON · Monad</div>
           </motion.aside>
         </>
       )}

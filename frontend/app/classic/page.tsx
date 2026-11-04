@@ -32,7 +32,7 @@ export default function Classic() {
         </h1>
         <p className="max-w-[62ch] text-ink-3">
           Deposit MON — we auto-swap into the highest-APY LST sleeve within caps and mint iMON.
-          Redeem always returns your pro-rata basket — no oracle, never paused. Unaudited.
+          Redeem always returns your pro-rata basket — no oracle, never paused.
         </p>
         <div
           className={`inline-flex w-fit items-center gap-2 rounded-lg border px-3 py-1.5 font-mono text-xs ${

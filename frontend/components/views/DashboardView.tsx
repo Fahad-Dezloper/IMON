@@ -5,7 +5,7 @@ import { LstCard } from "@/components/LstCard";
 import { Projection } from "@/components/Projection";
 import { useVaultData } from "@/lib/useVaultData";
 import { useUserPosition } from "@/lib/useUserPosition";
-import { fmtCompactUsd, fmtPct } from "@/lib/format";
+import { fmtMon, fmtPct } from "@/lib/format";
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -27,7 +27,7 @@ export function DashboardView({ onDeposit, onRedeem }: { onDeposit: () => void; 
         <ValueHero onDeposit={onDeposit} onRedeem={onRedeem} />
         <div className="grid grid-cols-3 gap-4">
           <Stat label="Net APY" value={fmtPct(stats.netApy)} />
-          <Stat label="TVL" value={fmtCompactUsd(stats.tvlUsd)} />
+          <Stat label="NAV" value={`${fmtMon(stats.navMon, 0)} MON`} />
           <Stat label="Tokens" value={String(basket.length)} />
         </div>
       </div>

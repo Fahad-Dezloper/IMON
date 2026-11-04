@@ -11,6 +11,7 @@ git pull --rebase --autostash origin main
 echo "[sync] building + testing backend…"
 cd backend
 forge build
-forge test
+# Skip the mainnet-fork test (ShMONFork) — it needs an RPC fork; run it manually with --fork-url.
+forge test --no-match-contract ShMONFork
 
 echo "[sync] OK — backend green at $(git rev-parse --short HEAD)"

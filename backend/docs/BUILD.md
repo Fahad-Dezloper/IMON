@@ -17,7 +17,7 @@ token set) until reviewed.
 |---|---|---|
 | `iMONVault` | Phase 1 ✅ | Share token + multi-asset NAV accounting, `deposit`/`redeem`, inflation defense. Gains caps + pause hooks (P3), fee hooks (P-fees), swap (P4). |
 | `IRateReader` | Phase 1 ✅ | Interface: `rateOf(asset) → MON per 1e18, 1e18 precision`. |
-| `RateReader` | Phase 2 | Production impl: per-LST adapters reading each LST's canonical rate getter; staleness + deviation + monotonic guards. |
+| `RateReader` | Phase 2 ✅ | Production impl: per-LST adapters reading each LST's canonical rate getter; staleness + deviation + monotonic guards. |
 | `AssetRegistry` | Phase 3 | Supported assets, per-asset `capBps`, `targetBps`, rate source, enabled flag. Governance-only. (In P1 this lives inline in the vault; extract here.) |
 | `FeeController` | Phase (fees) | Yield-skim (5% via HWM share dilution), exit fee, future swap fee; treasury; high-water-mark state. |
 | `Guardian` | Phase 3 | Two-tier pause: fast key can `pauseDeposits()`; un-pause + config via timelock + multisig. |

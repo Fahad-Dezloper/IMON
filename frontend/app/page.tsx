@@ -1,96 +1,57 @@
 "use client";
 
-import {
-  useAccount,
-  useChainId,
-  useConnect,
-  useDisconnect,
-  useSwitchChain,
-} from "wagmi";
-import { MONAD_CHAIN_ID } from "@/lib/contracts";
-
-function WalletButton() {
-  const { address, isConnected } = useAccount();
-  const { connect, connectors, isPending } = useConnect();
-  const { disconnect } = useDisconnect();
-
-  if (isConnected) {
-    return (
-      <button
-        onClick={() => disconnect()}
-        className="rounded-lg border border-neutral-700 px-4 py-2 font-mono text-sm hover:border-neutral-500"
-      >
-        {address?.slice(0, 6)}&hellip;{address?.slice(-4)} &middot; Disconnect
-      </button>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => connectors[0] && connect({ connector: connectors[0] })}
-      disabled={isPending || !connectors[0]}
-      className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-500 disabled:opacity-50"
-    >
-      {isPending ? "Connecting…" : "Connect Wallet"}
-    </button>
-  );
-}
+import { useAccount, useChainId } from "wagmi";
+import { WalletButton } from "@/components/WalletButton";
+import { VaultDashboard } from "@/components/VaultDashboard";
+import { MONAD_CHAIN_ID, isDeployed, vaultAddress } from "@/lib/contracts";
+import { shortAddress } from "@/lib/format";
 
 export default function Home() {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const chainId = useChainId();
-  const { switchChain } = useSwitchChain();
   const onMonad = chainId === MONAD_CHAIN_ID;
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 py-6">
-      <header className="flex items-center justify-between pb-16">
-        <span className="text-xl font-bold tracking-tight">iMON</span>
+    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-6">
+      <header className="flex items-center justify-between pb-10">
+        <div className="flex flex-col">
+          <span className="text-xl font-bold tracking-tight">iMON</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-violet-400">
+            Monad mainnet · chain {MONAD_CHAIN_ID}
+          </span>
+        </div>
         <WalletButton />
       </header>
 
-      <section className="mt-[6vh] flex flex-col gap-5">
-        <p className="font-mono text-xs uppercase tracking-[0.14em] text-violet-400">
-          Phase 0 · scaffold
-        </p>
-        <h1 className="text-balance text-4xl font-bold leading-tight sm:text-5xl">
+      <section className="mb-8 flex flex-col gap-3">
+        <h1 className="text-balance text-3xl font-bold leading-tight sm:text-4xl">
           The simple, safer home for Monad staking.
         </h1>
-        <p className="max-w-[60ch] text-lg text-neutral-400">
-          One token holds a capped, auto-balanced basket of Monad staking tokens.
-          Auto-compounding, always redeemable, with a hard cap on how much any single
-          token can cost you.
+        <p className="max-w-[62ch] text-neutral-400">
+          Deposit MON — we auto-swap into the highest-APY LST sleeve within caps and mint iMON.
+          Redeem always returns your pro-rata basket — no oracle, never paused. Unaudited.
         </p>
-
         <div
-          className={`mt-3 flex flex-wrap items-center gap-3 rounded-xl border px-4 py-3 font-mono text-sm ${
-            isConnected
-              ? onMonad
+          className={`inline-flex w-fit items-center gap-2 rounded-lg border px-3 py-1.5 font-mono text-xs ${
+            isDeployed
+              ? isConnected && onMonad
                 ? "border-emerald-700/50 text-emerald-400"
-                : "border-amber-700/50 text-amber-400"
-              : "border-neutral-800 text-neutral-400"
+                : "border-neutral-700 text-neutral-400"
+              : "border-amber-700/50 text-amber-400"
           }`}
         >
-          {!isConnected && "Connect a wallet to begin."}
-          {isConnected && onMonad && (
-            <span>
-              Connected: {address?.slice(0, 6)}&hellip;{address?.slice(-4)} &middot; Monad
-              mainnet (143)
-            </span>
-          )}
-          {isConnected && !onMonad && (
+          {isDeployed ? (
             <>
-              <span>Wrong network (chain {chainId}).</span>
-              <button
-                onClick={() => switchChain({ chainId: MONAD_CHAIN_ID })}
-                className="rounded-md border border-amber-600/60 px-2 py-1 text-xs hover:bg-amber-600/10"
-              >
-                Switch to Monad
-              </button>
+              Live vault {vaultAddress ? shortAddress(vaultAddress) : "—"}
+              {isConnected ? (onMonad ? " · connected" : " · switch network") : " · connect wallet"}
             </>
+          ) : (
+            "Waiting for deployment addresses"
           )}
         </div>
       </section>
+
+      <VaultDashboard />
     </main>
   );
 }

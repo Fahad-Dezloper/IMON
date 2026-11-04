@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
+    // Pin root so Turbopack doesn't walk to ~/ and choke on ABI JSON / lockfiles.
+    root: __dirname,
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],

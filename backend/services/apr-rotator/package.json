@@ -1,0 +1,20 @@
+{
+  "name": "imon-apr-rotator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Keeper: record YieldOracle APRs and rebalance iMON vault toward max trailing APR within caps",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "once": "tsx src/index.ts --once",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "viem": "^2.57.16"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}

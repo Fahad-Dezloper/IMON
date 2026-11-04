@@ -10,8 +10,9 @@ DEST="../frontend/lib/abi"
 mkdir -p "$DEST"
 
 # One line per deployed/public contract. Add new contracts here as phases land.
-for C in iMONVault; do
-  forge inspect "$C" abi > "$DEST/$C.json"
+for C in iMONVault RateReader YieldOracle AssetRegistry ShMONRateAdapter ERC4626RateAdapter UniswapV3SwapAdapter; do
+  # --json is required; without it forge prints a human table that breaks Next.js imports.
+  forge inspect "$C" abi --json > "$DEST/$C.json"
   echo "[export-abi] wrote $DEST/$C.json"
 done
 

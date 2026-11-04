@@ -40,7 +40,11 @@ forge test
 - **Phase 1 done:** `src/iMONVault.sol` — multi-asset NAV accounting, `deposit`/`redeem`,
   three-layer inflation/donation defense. `src/interfaces/IRateReader.sol`. 14 passing tests
   in `test/iMONVault.t.sol` (incl. a fuzz round-trip and a donation-attack test).
-- **Next (Phase 2):** production `RateReader` with real LST adapters + guards, mainnet-fork test.
+- **Phase 2 done:** `src/RateReader.sol` + `ShMONRateAdapter` / `ERC4626RateAdapter`;
+  staleness / deviation / monotonic guards; 10 RateReader unit tests + 4 mainnet-fork tests
+  (`forge test --match-path test/ShMONFork.t.sol --fork-url https://rpc.monad.xyz`).
+  Confirmed LST addresses in `deployments/143.json` (shMON launch-ready; sMON rate ABI TODO).
+- **Next (Phase 3):** AssetRegistry extract, weight + guarded-launch caps, Guardian, keeper.
 
 Full per-phase plan: [`docs/BUILD.md`](docs/BUILD.md). Shared roadmap: [`../docs/PHASES.md`](../docs/PHASES.md).
 

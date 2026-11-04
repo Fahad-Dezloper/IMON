@@ -27,3 +27,13 @@ backend/broadcast/
 # misc
 .DS_Store
 *.log
+
+# deployer identity / keys (never commit)
+DEPLOYER_ADDRESS.txt
+**/DEPLOYER_PRIVATE_KEY*
+
+# stale parallel foundry tree (canonical code lives in backend/)
+/contracts/out/
+/contracts/cache/
+/contracts/broadcast/
+/contracts/lib/

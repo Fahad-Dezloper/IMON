@@ -5,7 +5,6 @@ import { formatUnits } from "viem";
 import {
   useAccount,
   useBalance,
-  useChainId,
   usePublicClient,
   useReadContract,
   useSwitchChain,
@@ -27,8 +26,7 @@ function Row({ k, v }: { k: string; v: string }) {
 }
 
 export function DepositModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
+  const { address, isConnected, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
   const onMonad = chainId === MONAD_CHAIN_ID;
   const vault = vaultAddress ?? undefined;

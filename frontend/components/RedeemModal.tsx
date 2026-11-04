@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { formatUnits } from "viem";
 import {
   useAccount,
-  useChainId,
   usePublicClient,
   useReadContract,
   useSwitchChain,
@@ -17,8 +16,7 @@ import { MONAD_CHAIN_ID, basketAssets, explorerTx, iMONVaultABI, vaultAddress } 
 import { formatToken, parseToken, shortAddress } from "@/lib/format";
 
 export function RedeemModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
+  const { address, isConnected, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
   const onMonad = chainId === MONAD_CHAIN_ID;
   const vault = vaultAddress ?? undefined;
